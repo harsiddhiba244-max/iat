@@ -1,0 +1,863 @@
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — NumPy & Pandas Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --card: #1e2235;
+    --border: #2a2f45;
+    --numpy: #f6a623;
+    --pandas: #4ec9f0;
+    --output-bg: #12161f;
+    --output-border: #2e3a2e;
+    --output-text: #7dd47a;
+    --text: #e8eaf0;
+    --muted: #8891a8;
+    --tag-np-bg: #2a2010;
+    --tag-pd-bg: #0f2030;
+    --code-bg: #131720;
+    --heading: #ffffff;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0f1117 0%, #181c27 50%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(246,166,35,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(78,201,240,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .breadcrumb {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 1.5rem;
+  }
+
+  .pill-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .pill.np { background: var(--tag-np-bg); color: var(--numpy); border: 1px solid rgba(246,166,35,0.25); }
+  .pill.pd { background: var(--tag-pd-bg); color: var(--pandas); border: 1px solid rgba(78,201,240,0.25); }
+  .pill.gray { background: #1a1f2e; color: var(--muted); border: 1px solid var(--border); }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0 1.5rem;
+  }
+  .section-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: -0.3px;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .np-icon { background: var(--tag-np-bg); color: var(--numpy); border: 1px solid rgba(246,166,35,0.3); }
+  .pd-icon { background: var(--tag-pd-bg); color: var(--pandas); border: 1px solid rgba(78,201,240,0.3); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #3a4060; }
+
+  .card-header {
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cell-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    min-width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--heading);
+    flex: 1;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .tag.np { background: var(--tag-np-bg); color: var(--numpy); }
+  .tag.pd { background: var(--tag-pd-bg); color: var(--pandas); }
+
+  .card-body {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border);
+  }
+
+  .code-label, .output-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  .code-label { color: rgba(246,166,35,0.6); }
+  .output-label { color: rgba(125,212,122,0.6); }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #c8d4f0;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  .output-block {
+    background: var(--output-bg);
+    border: 1px solid var(--output-border);
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--output-text);
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .cheatsheet {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+  .cheatsheet-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--heading);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cheatsheet table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .cheatsheet th {
+    background: var(--bg);
+    padding: 0.6rem 1.25rem;
+    text-align: left;
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .cheatsheet td {
+    padding: 0.6rem 1.25rem;
+    border-bottom: 1px solid rgba(42,47,69,0.5);
+    vertical-align: middle;
+  }
+  .cheatsheet tr:last-child td { border-bottom: none; }
+  .cheatsheet tr:hover td { background: rgba(255,255,255,0.02); }
+  .cheatsheet td:first-child { color: var(--muted); font-family: 'Sora', sans-serif; font-size: 12px; width: 40%; }
+  .cheatsheet td:last-child code {
+    color: #c8d4f0;
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    font-size: 11.5px;
+  }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+  /* syntax highlight helpers */
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cm { color: #546e7a; font-style: italic; }
+  .attr { color: var(--numpy); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="breadcrumb">Data Science · Practical Notes</div>
+  <h1>Day 1 — Basics</h1>
+  <p class="hero-sub">NumPy &amp; Pandas fundamentals with programs, explanations and sample outputs</p>
+  <div class="pill-row">
+    <span class="pill np">NumPy</span>
+    <span class="pill pd">Pandas</span>
+    <span class="pill gray">Python 3.13</span>
+    <span class="pill gray">Student ID: 24DIT003</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ─────────────────────────── NUMPY ─────────────────────────── -->
+  <div class="section-header">
+    <div class="section-icon np-icon">np</div>
+    <h2>NumPy</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <!-- 1 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [2]</span>
+      <span class="card-title">Import NumPy</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Imports the NumPy library with the standard alias <code style="color:var(--numpy)">np</code> so you can call NumPy functions using <code style="color:var(--numpy)">np.something</code> throughout the notebook.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="kw">import</span> numpy <span class="kw">as</span> np</pre>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [4]</span>
+      <span class="card-title">Check NumPy Version</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Prints the currently installed version of NumPy. Useful for checking compatibility with other libraries.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#if you wanna chack version of the given lib.</span>
+<span class="fn">print</span>(np.__version__)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">2.1.3</div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [6]</span>
+      <span class="card-title">Arrays of Zeros and Ones</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code style="color:var(--numpy)">np.zeros(n)</code> creates an array of <code>n</code> float zeros. <code style="color:var(--numpy)">np.ones(n)</code> creates an array of <code>n</code> float ones. Both are useful for initializing arrays before filling them.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#array of zeros</span>
+<span class="fn">print</span>(np.zeros(<span class="num">4</span>))
+<span class="cm">#array of ones</span>
+<span class="fn">print</span>(np.ones(<span class="num">5</span>))</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[0. 0. 0. 0.]
+[1. 1. 1. 1. 1.]</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [18]</span>
+      <span class="card-title">Create Array from a List</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code style="color:var(--numpy)">np.array()</code> converts a Python list into a NumPy array. NumPy arrays support fast vectorized operations that normal lists do not.</p>
+      <div class="code-label">Code</div>
+      <pre>arr=np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>])
+<span class="fn">print</span>(arr)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[1 2 3 4 5]</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [34]</span>
+      <span class="card-title">Vectorized Operations &amp; Boolean Filtering</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">NumPy applies operations to every element at once without loops. <code>arr*2</code> doubles each element, <code>arr+arr</code> adds element-wise, <code>arr**2</code> squares each, and <code>arr[arr>=5]</code> filters elements by condition.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="fn">print</span>(arr*<span class="num">2</span>)<span class="cm"># will multiply 2 with every element</span>
+<span class="fn">print</span>(arr+arr) <span class="cm"># will add both the array</span>
+<span class="fn">print</span>(arr**<span class="num">2</span>)<span class="cm"># square of each element</span>
+<span class="fn">print</span>(arr[arr>=<span class="num">5</span>])</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[ 2  4  6  8 10]
+[ 2  4  6  8 10]
+[ 1  4  9 16 25]
+[5]</div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [11]</span>
+      <span class="card-title">np.arange() — Range-based Array</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code style="color:var(--numpy)">np.arange(start, stop, step)</code> creates an array from <code>start</code> up to (not including) <code>stop</code>, jumping by <code>step</code>. Similar to Python's built-in <code>range()</code> but returns a NumPy array.</p>
+      <div class="code-label">Code</div>
+      <pre>arr2 = np.arange(<span class="num">1</span>, <span class="num">10</span>, <span class="num">2</span>)  <span class="cm"># Start, stop, step</span>
+<span class="fn">print</span>(arr2)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[1 3 5 7 9]</div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [16]</span>
+      <span class="card-title">np.linspace() — Equally Spaced Values</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code style="color:var(--numpy)">np.linspace(start, stop, n)</code> generates <code>n</code> evenly spaced values between <code>start</code> and <code>stop</code> (both inclusive). Unlike <code>arange</code>, you control the number of points, not the step size.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#eqally spaced 5 values bet 1 to 10</span>
+arr3 = np.linspace(<span class="num">1</span>, <span class="num">10</span>, <span class="num">5</span>)
+<span class="fn">print</span>(arr3)
+
+arr4 = np.linspace(<span class="num">0</span>,<span class="num">100</span>,<span class="num">11</span>)
+<span class="fn">print</span>(arr4)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[ 1.    3.25  5.5   7.75 10.  ]
+[  0.  10.  20.  30.  40.  50.  60.  70.  80.  90. 100.]</div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [21]</span>
+      <span class="card-title">Array Properties — shape, size, dtype</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code>.shape</code> returns dimensions as a tuple, <code>.size</code> gives total element count, and <code>.dtype</code> shows the data type stored in the array. These are essential when working with large datasets.</p>
+      <div class="code-label">Code</div>
+      <pre>arr6  = np.array([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>])
+
+<span class="fn">print</span>(<span class="str">f"Shape (dimensions): {arr6.shape}"</span>)
+<span class="fn">print</span>(<span class="str">f"Size (total elements): {arr6.size}"</span>)
+<span class="fn">print</span>(<span class="str">f"Data type: {arr6.dtype}"</span>)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">Shape (dimensions): (5,)
+Size (total elements): 5
+Data type: int64</div>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [30]</span>
+      <span class="card-title">Aggregate Functions — max, min, sum, std</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Built-in statistical methods on NumPy arrays. <code>.max()</code> largest value, <code>.min()</code> smallest, <code>.sum()</code> total, <code>.std()</code> standard deviation. The <code>:.2f</code> in the f-string rounds the output to 2 decimal places.</p>
+      <div class="code-label">Code</div>
+      <pre>arr7 = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>])
+<span class="fn">print</span>(arr7.max())
+<span class="fn">print</span>(arr7.min())
+<span class="fn">print</span>(arr7.sum())
+<span class="fn">print</span>(<span class="str">f"{arr7.std():.2f}"</span>)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">4
+1
+10
+1.12</div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [32]</span>
+      <span class="card-title">Generate Random Integer Array</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code style="color:var(--numpy)">np.random.randint(low, high, size)</code> generates an array of random integers between <code>low</code> (inclusive) and <code>high</code> (exclusive). Output changes every run.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#random array</span>
+<span class="fn">print</span>(np.random.randint(<span class="num">1</span>, <span class="num">100</span>, <span class="num">5</span>))</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">[27 55 64 38 28]</div>
+    </div>
+  </div>
+
+  <!-- 11 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [35]</span>
+      <span class="card-title">Indexing and Slicing</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Access elements by position: <code>arr[0]</code> first, <code>arr[-1]</code> last (negative counts from end), <code>arr[1:4]</code> slice from index 1 to 3, <code>arr[::2]</code> every 2nd element (step slicing).</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#indexing and slicing</span>
+arr8 = np.array([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>])
+<span class="fn">print</span>(<span class="str">f"Array: {arr8}"</span>)
+<span class="fn">print</span>(<span class="str">f"First element: {arr8[0]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Last element: {arr8[-1]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Elements from index 1 to 3: {arr8[1:4]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Every 2nd element: {arr8[::2]}"</span>)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">Array: [10 20 30 40 50]
+First element: 10
+Last element: 50
+Elements from index 1 to 3: [20 30 40]
+Every 2nd element: [10 30 50]</div>
+    </div>
+  </div>
+
+  <!-- 12 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [36]</span>
+      <span class="card-title">2D Array (Matrix) — Shape &amp; Indexing</span>
+      <span class="tag np">numpy</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">A 2D array is a matrix. Access elements with <code>[row, col]</code>, entire rows with <code>[row, :]</code>, and entire columns with <code>[:, col]</code>. <code>.shape</code> returns <code>(rows, columns)</code>.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm"># Create a 2D array</span>
+matrix = np.array([
+    [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>],
+    [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>],
+    [<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>]
+])
+<span class="fn">print</span>(<span class="str">"Matrix:"</span>)
+<span class="fn">print</span>(matrix)
+<span class="fn">print</span>(<span class="str">f"\nShape: {matrix.shape}"</span>)
+<span class="fn">print</span>(<span class="str">f"Element at row 1, col 2: {matrix[1, 2]}"</span>)
+<span class="fn">print</span>(<span class="str">f"First row: {matrix[0, :]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Second column: {matrix[:, 1]}"</span>)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">Matrix:
+[[1 2 3]
+ [4 5 6]
+ [7 8 9]]
+
+Shape: (3, 3)
+Element at row 1, col 2: 6
+First row: [1 2 3]
+Second column: [2 5 8]</div>
+    </div>
+  </div>
+
+  <!-- NumPy Cheat Sheet -->
+  <div class="cheatsheet">
+    <div class="cheatsheet-header" style="color:var(--numpy);">▸ NumPy Cheat Sheet</div>
+    <table>
+      <tr><th>Operation</th><th>Code</th></tr>
+      <tr><td>Create array</td><td><code>np.array([1,2,3])</code></td></tr>
+      <tr><td>Zeros</td><td><code>np.zeros(5)</code></td></tr>
+      <tr><td>Ones</td><td><code>np.ones(5)</code></td></tr>
+      <tr><td>Range</td><td><code>np.arange(1, 10, 2)</code></td></tr>
+      <tr><td>Linspace</td><td><code>np.linspace(0, 1, 5)</code></td></tr>
+      <tr><td>First element</td><td><code>arr[0]</code></td></tr>
+      <tr><td>Slice</td><td><code>arr[1:4]</code></td></tr>
+      <tr><td>Add 10</td><td><code>arr + 10</code></td></tr>
+      <tr><td>Multiply by 2</td><td><code>arr * 2</code></td></tr>
+      <tr><td>Sum</td><td><code>np.sum(arr)</code></td></tr>
+      <tr><td>Mean</td><td><code>np.mean(arr)</code></td></tr>
+      <tr><td>Min / Max</td><td><code>np.min(arr) / np.max(arr)</code></td></tr>
+      <tr><td>Std Dev</td><td><code>np.std(arr)</code></td></tr>
+    </table>
+  </div>
+
+
+  <div class="divider"></div>
+
+  <!-- ─────────────────────────── PANDAS ─────────────────────────── -->
+  <div class="section-header">
+    <div class="section-icon pd-icon">pd</div>
+    <h2>Pandas</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <!-- 13 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [38]</span>
+      <span class="card-title">Import Pandas</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Imports the Pandas library with alias <code style="color:var(--pandas)">pd</code>. Pandas provides DataFrame and Series structures for structured data manipulation.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd</pre>
+    </div>
+  </div>
+
+  <!-- 14 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [39]</span>
+      <span class="card-title">Create a DataFrame from Dictionary</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">A DataFrame is a 2D table with labeled rows and columns. Created from a Python dictionary where keys become column names and values (lists) become column data. Each list must be the same length.</p>
+      <div class="code-label">Code</div>
+      <pre>data={
+     <span class="str">'Name'</span>: [<span class="str">'A'</span>, <span class="str">'B'</span>, <span class="str">'C'</span>, <span class="str">'D'</span>],
+    <span class="str">'Age'</span>: [<span class="num">25</span>, <span class="num">30</span>, <span class="num">35</span>, <span class="num">28</span>],
+    <span class="str">'Salary'</span>: [<span class="num">50000</span>, <span class="num">60000</span>, <span class="num">75000</span>, <span class="num">55000</span>]
+}
+df=pd.DataFrame(data)
+<span class="fn">print</span>(df)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">  Name  Age  Salary
+0    A   25   50000
+1    B   30   60000
+2    C   35   75000
+3    D   28   55000</div>
+    </div>
+  </div>
+
+  <!-- 15 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [40]</span>
+      <span class="card-title">Create a Pandas Series</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">A Series is a 1D labeled array. Each element has an index (0, 1, 2...). A single column of a DataFrame is a Series. The <code>name</code> parameter gives the Series a label.</p>
+      <div class="code-label">Code</div>
+      <pre>series=pd.Series([<span class="num">10</span>,<span class="num">20</span>,<span class="num">30</span>,<span class="num">40</span>],name=<span class="str">'numbers'</span>)
+<span class="fn">print</span>(series)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">0    10
+1    20
+2    30
+3    40
+Name: numbers, dtype: int64</div>
+    </div>
+  </div>
+
+  <!-- 16 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [48]</span>
+      <span class="card-title">DataFrame Properties — shape, columns, dtypes, head, tail</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Quickly inspect a DataFrame: <code>.shape</code> returns (rows, cols), <code>.columns</code> lists column names, <code>.dtypes</code> shows data types per column, <code>.head(n)</code> shows first n rows, <code>.tail(n)</code> shows last n rows.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="fn">print</span>(<span class="str">"shape(rows,col) :"</span>,df.shape)
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">50</span>)
+<span class="fn">print</span>(<span class="str">"column names :"</span>,df.columns.tolist())
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">50</span>)
+<span class="fn">print</span>(<span class="str">"Data Types:"</span>,df.dtypes)
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">50</span>)
+<span class="fn">print</span>(df.head(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">50</span>)
+<span class="fn">print</span>(df.tail(<span class="num">2</span>))</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">shape(rows,col) : (4, 3)
+==================================================
+column names : ['Name', 'Age', 'Salary']
+==================================================
+Data Types: Name      object
+Age        int64
+Salary     int64
+dtype: object
+==================================================
+  Name  Age  Salary
+0    A   25   50000
+1    B   30   60000
+==================================================
+  Name  Age  Salary
+2    C   35   75000
+3    D   28   55000</div>
+    </div>
+  </div>
+
+  <!-- 17 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [51]</span>
+      <span class="card-title">Access Columns</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc">Use <code>df['ColName']</code> to get a single column as a Series. Use <code>df[['Col1', 'Col2']]</code> (double brackets) to get multiple columns as a DataFrame.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#get columns</span>
+<span class="fn">print</span>(df[<span class="str">'Name'</span>])
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">50</span>)
+<span class="fn">print</span>(df[[<span class="str">'Name'</span>,<span class="str">'Age'</span>]])</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">0    A
+1    B
+2    C
+3    D
+Name: Name, dtype: object
+==================================================
+  Name  Age
+0    A   25
+1    B   30
+2    C   35
+3    D   28</div>
+    </div>
+  </div>
+
+  <!-- 18 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [54]</span>
+      <span class="card-title">Access Rows — iloc and loc</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code>.iloc[n]</code> accesses rows by integer position (like list indexing). <code>.iloc[1:3]</code> slices rows. <code>.loc[index, 'Col']</code> accesses by label/index name — here row 0, column 'Age' returns 25.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm">#get rows</span>
+<span class="fn">print</span>(<span class="str">"1st row"</span>)
+<span class="fn">print</span>(df.iloc[<span class="num">0</span>])
+<span class="fn">print</span>(<span class="str">"rows 1-2"</span>)
+<span class="fn">print</span>(df.iloc[<span class="num">1</span>:<span class="num">3</span>])
+<span class="fn">print</span>(<span class="str">f"\nRows by label"</span>)
+<span class="fn">print</span>(df.loc[<span class="num">0</span>,<span class="str">'Age'</span>])</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">1st row
+Name          A
+Age          25
+Salary    50000
+Name: 0, dtype: object
+rows 1-2
+  Name  Age  Salary
+1    B   30   60000
+2    C   35   75000
+
+Rows by label
+25</div>
+    </div>
+  </div>
+
+  <!-- 19 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [55]</span>
+      <span class="card-title">Save to CSV and Load Back</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code>.to_csv(filename, index=False)</code> saves the DataFrame to a CSV file. <code>index=False</code> prevents writing the row numbers as a column. <code>pd.read_csv(filename)</code> loads it back into a new DataFrame.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="cm"># Save to CSV</span>
+csv_file = <span class="str">'sample_data.csv'</span>
+df.to_csv(csv_file, index=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="str">f"✓ DataFrame saved to {csv_file}"</span>)
+
+<span class="cm"># Read it back</span>
+df_loaded = pd.read_csv(csv_file)
+<span class="fn">print</span>(<span class="str">"\nLoaded back from CSV:"</span>)
+<span class="fn">print</span>(df_loaded)</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">✓ DataFrame saved to sample_data.csv
+
+Loaded back from CSV:
+  Name  Age  Salary
+0    A   25   50000
+1    B   30   60000
+2    C   35   75000
+3    D   28   55000</div>
+    </div>
+  </div>
+
+  <!-- 20 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="cell-number">In [58]</span>
+      <span class="card-title">Describe — Summary Statistics</span>
+      <span class="tag pd">pandas</span>
+    </div>
+    <div class="card-body">
+      <p class="desc"><code>.describe()</code> generates a statistical summary for all numerical columns: count, mean, standard deviation, min, 25th percentile (Q1), median (50%), 75th percentile (Q3), and max. One of the most used methods in data analysis.</p>
+      <div class="code-label">Code</div>
+      <pre><span class="fn">print</span>(df.describe())</pre>
+      <div class="output-label">Output</div>
+      <div class="output-block">             Age        Salary
+count   4.000000      4.000000
+mean   29.500000  60000.000000
+std     4.203173  10801.234497
+min    25.000000  50000.000000
+25%    27.250000  53750.000000
+50%    29.000000  57500.000000
+75%    31.250000  63750.000000
+max    35.000000  75000.000000</div>
+    </div>
+  </div>
+
+  <!-- Pandas Cheat Sheet -->
+  <div class="cheatsheet">
+    <div class="cheatsheet-header" style="color:var(--pandas);">▸ Pandas Cheat Sheet</div>
+    <table>
+      <tr><th>Operation</th><th>Code</th></tr>
+      <tr><td>Create DataFrame</td><td><code>pd.DataFrame({'col': [1,2,3]})</code></td></tr>
+      <tr><td>Get column</td><td><code>df['Name']</code></td></tr>
+      <tr><td>Get row</td><td><code>df.iloc[0]</code> or <code>df.loc[0]</code></td></tr>
+      <tr><td>Filter</td><td><code>df[df['Age'] > 25]</code></td></tr>
+      <tr><td>Sum</td><td><code>df['col'].sum()</code></td></tr>
+      <tr><td>Mean</td><td><code>df['col'].mean()</code></td></tr>
+      <tr><td>Sort</td><td><code>df.sort_values('Age')</code></td></tr>
+      <tr><td>Add column</td><td><code>df['new'] = df['old'] * 2</code></td></tr>
+      <tr><td>Group by</td><td><code>df.groupby('Dept')['Salary'].sum()</code></td></tr>
+      <tr><td>Fill missing</td><td><code>df['col'].fillna(value)</code></td></tr>
+      <tr><td>Drop missing</td><td><code>df.dropna()</code></td></tr>
+      <tr><td>Save CSV</td><td><code>df.to_csv('file.csv')</code></td></tr>
+      <tr><td>Load CSV</td><td><code>df = pd.read_csv('file.csv')</code></td></tr>
+      <tr><td>Describe</td><td><code>df.describe()</code></td></tr>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">Day 1 Basics · NumPy &amp; Pandas · Student ID: 24DIT003</div>
+
+</body>
+</html>
