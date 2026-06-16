@@ -1,0 +1,51 @@
+Level A (Basic Dataset Exploration)
+
+What are the dimensions of the dataset?
+How many rows and columns does the dataset have?
+Display rows 5 to 15.
+What is the data type of the 'age' column?
+What is the data type of the 'gender' column?
+Display the first 3 rows of the dataset.
+Display the last 5 rows of the dataset.
+What is the column name at index 2?
+List all column names in order.
+Is 'zip_code' a column in the dataset?
+
+Level B (Data Filtering & Value Counts)
+
+How many unique genders are there in the dataset?
+What are the unique genders?
+What is the most frequent gender?
+How many unique zip codes exist?
+What is the least frequent occupation?
+How many users have the occupation 'student'?
+How many users are there for the most common occupation?
+Display the top 5 occupations by frequency.
+What is the second most frequent occupation?
+How many null values are in the 'occupation' column?
+
+Level C (Statistical Analysis)
+
+What is the minimum age in the dataset?
+What is the maximum age in the dataset?
+What is the median age of users?
+What is the standard deviation of age?
+What is the variance of age?
+What is the age range (max - min)?
+What is the age at the 75th percentile?
+What is the age at the 25th percentile?
+How many users are older than 30?
+How many users are younger than 25?
+What is the mean age of male users?
+What is the mean age of female users?
+Which gender has a higher average age?
+What is the mode (most common age)?
+How many users are exactly 30 years old?
+
+Level D (Advanced Analysis)
+
+What percentage of users are in the 'student' occupation?
+Create a frequency distribution of ages.
+What is the most common age-occupation combination?
+How many occupations have only 1 user?
+What is the age distribution by gender?
